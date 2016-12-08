@@ -37,16 +37,15 @@ GrnoJson-objects may be initialized from file names (str), dictionaries (dict) o
 
 A typical workflow for graph manipulation:
 
-from .GrnoJson import GrnoJson  
-indata = GrnoJson('old_file.json')  
-from .Grno import Grno  
-graph = Grno(indata)  
+from .GrnoJson import *
+in_data = GrnoJson('old_file.json')  
+graph = Grno(in_data)  
 
 for segment in graph.segments:  
     do something ... (e.g. syntactic parsing, eliciting annotations in an interactive way, etc.)  
 
-outdata = GrnoJson(graph)  
-outdata.write_to_file('new_file.json')  
+out_data = GrnoJson(graph)  
+out_data.write_to_file('new_file.json')  
 
 # Some functionalities (implemented though not yet on GitHub):
 
