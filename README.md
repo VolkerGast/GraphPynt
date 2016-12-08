@@ -37,7 +37,7 @@ GrnoJson-objects may be initialized from file names (str), dictionaries (dict) o
 
 A typical workflow for graph manipulation:
 
-from .GrnoJson import *
+from .GrnoJson import *  
 in_data = GrnoJson('old_file.json')  
 graph = Grno(in_data)  
 
