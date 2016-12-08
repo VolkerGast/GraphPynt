@@ -100,7 +100,7 @@ class Grno:
         and returns edgeid
         '''
         edgeid +=1
-        edge = {'type': 'a', 'start': start, 'end': end, 'attr': attr}
+        edge = {'type': 'a', 'start': start, 'end': end, 'attr': attr, 'id': edgeid}
         self.anno_edges.append(edge)
         return edgeid
         
@@ -109,20 +109,19 @@ class Grno:
         an attribute-dict for the edges, a nodeid and an edgeid
         and returns nodeid, edgeid
         '''
-        nodeid = self.create_anode(sentid, nodeattr, nodeid)
+        nodeid = self.create_anno_node(sentid, nodeattr, nodeid)
         for childid in childids:
-            edgeid = self.create_aedge(nodeid, childid, edgeattr, edgeid)
+            edgeid = self.create_anno_edge(nodeid, childid, edgeattr, edgeid)
         return nodeid, edgeid
 
     def create_child(self, sentid, motherids, nodeattr, edgeattr, nodeid, edgeid):
         '''takes segment-id, a list of mother-ids, an attribute-dict for the nodes,
         an attribute-dict for the edges, a noreid and an edgeid
         and returns nodeid, edgeid'''
-        nodeid = self.create_anode(sentid, nodeattr, nodeid)
+        nodeid = self.create_anno_node(sentid, nodeattr, nodeid)
         for motherid in motherids:
-            edgeid = self.create_aedge(motherid, nodeid, edgeattr, edgeid)
+            edgeid = self.create_anno_edge(motherid, nodeid, edgeattr, edgeid)
         return nodeid, edgeid
-
 
     # create order edges ...
     # ... between tokens
@@ -130,7 +129,8 @@ class Grno:
         '''takes start node, end node and edgeid
         and returns edgeid
         '''
-        self.order_edges_token.append({'type': 'o', 'start': start, 'end': end})
+        edgeid += 1
+        self.order_edges_token.append({'type': 'o', 'start': start, 'end': end, 'id': edgeid})
         return edgeid
 
     def create_order_edges_token(self, tokens, sortkey, edgeid):
@@ -138,13 +138,13 @@ class Grno:
         and returns edgeid
         '''
         for i, token in enumerate(sorted(tokens[:-1], key = lambda x: x[sortkey])):
-            edgeid += 1
-            self.create_order_edge_token(token['id'], tokens[i+1], edgeid)
+            self.create_order_edge_token(token['id'], tokens[i+1]['id'], edgeid)
         return edgeid
 
     # ... between annotation nodes of a specific level
     def create_order_edge_anno(self, start, end, edgeid):
         '''takes start-node-id, end-node-id and returns edgeid'''
+        edgeid += 1
         self.order_edges_anno.append({'id': edgeid, 'type':'o',
                                       'start': start, 'end': end})
         return edgeid
@@ -152,23 +152,23 @@ class Grno:
     def create_order_edges_anno(self, anno_nodes, sortkey, edgeid):
         '''takes list of anno-nodes, sortkey and edgeid
         and returns edgeid'''
-        for i, anode in enumerate(sorted(anno_nodes[:-1], key = lambda x: x[sortkey])):
-            edgeid += 1
-            self.create_order_edge_anno(anode['id'], anode[i+1], edgeid)
+        sort_nodes = sorted(anno_nodes, key = lambda x: x[sortkey])
+        for i, anode in enumerate(sort_nodes[:-1]):
+            self.create_order_edge_anno(anode['id'], sort_nodes[i+1]['id'], edgeid)
         return edgeid
     
     # ... between segments
     def create_order_edge_segment(self, start, end, edgeid):
         '''takes start-segment-id and end-segment-id
         and returns edgeid'''
-        self.order_edges_segment.append({'type': 'o', 'start': start, 'end': end})
+        edgeid += 1
+        self.order_edges_segment.append({'type': 'o', 'start': start, 'end': end, 'id': edgeid})
         return edgeid
 
     def create_order_edges_seg(self, segments, sortkey, edgeid):
         '''takes list of segments, sortkey and edgeid
         and returns edgeid'''
         for i, segment in enumerate(sorted(segments[:-1], key = lambda x: x[sortkey])):
-            edgeid += 1
             self.create_order_edge_segment(segment['id'], segment[i+1], edgeid)
         return edgeid
     

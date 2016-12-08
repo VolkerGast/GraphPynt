@@ -22,7 +22,7 @@ class GrnoJson:
                                  in enumerate(source.segment_map.items())]
                 edge_id = max([edge['id'] for edge
                               in source.anno_edges
-                              + source.oorder_edges_token
+                              + source.order_edges_token
                               + source.order_edges_anno
                               + source.order_edges_segment
                               + segment_edges])
@@ -44,7 +44,7 @@ class GrnoJson:
                 self.data = {
                     'nodes': source.paragraphs
                         + source.segments
-                        + source.seakers
+                        + source.speakers
                         + source.tokens
                         + source.anno_nodes,
                     'info': source.info,
