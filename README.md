@@ -5,9 +5,25 @@ This package allows users to import, manipulate and export [GraphAnno](http://gi
 
 # Data structure
 
-The data is represented as a graph. All tokens ('type': 't') and annotation nodes ('type': 'a') are assigned to one segment (type 's'). Tokens are ordered (by order edges). Segments may be assigned to paragraphs ('type': 'p'), and paragraphs may be assigned to higher-level paragraphs.
+See the [documentation](https://github.com/LBierkandt/graph-anno/blob/master/doc/GraphAnno-Documentation_en.pdf) for information on the data model
+
+# Corpus structure
+
+A GraphAnno-corpus consists of documents. GraphAnno data are stored in JSON-files. A JSON-file may contain (i) all data pertaining to a corpus (mono-document corpus), (ii) only corpus-related data (-> master-file or corpus), or (iii) only the data of a document forming part of a corpus (-> document file).
+
+GraphPynt separates corpus data and documents. Documents are represented in Grno-objects. Grno-objects are instantiated from pairs of a GrnoCorp-object (providing the corpus data) and a GrnoFile-object (providing the document data). The latter objects are instantiated from the JSON-files. GrnoCorp- and GrnoFile-objects contain the data in a way analogous to the serialization format, stored in dictionaries.
+
+master.json -> GrnoCorp(master.json)
+                                            \
+                                              Grno(GrnoCorp(master.json), GrnoFile(document.json))
+			                    /
+document.json -> GrnoFile(document.json)
+
+In the case of mono-document files, both the GrnoJsonCorp and the GrnoJsonFile are instantiated from the same JSON-file. When being saved, they will be split up into a corpus file, carrying a prefix 'c_', and a document file, carrying a prefix 'f_'.
 
 # The Grno-class
+
+
 
 The data is represented in Grno-objects in the form of lists (nodes, annotation edges, order edges) and dictionaries (assignment edges from paragraphs, segments or speakers to nodes; a map from node-ids to nodes).
 
