@@ -1,11 +1,11 @@
 import codecs
 import json
-from GraphPynt.Grno import Grno
-from GraphPynt.data_maps import meta_data_keys
-from GraphPynt.data_maps import map_type_map
+from Grno import Grno
+from data_maps import data_keys_corp
+from functions import get_indep_nodes
 
 
-class GrnoJson:
+class GrnoJsonCorp:
     # Grno-data as Python dictonary
     # instatiated from a file (string)
     # or a Grno-object
@@ -14,15 +14,30 @@ class GrnoJson:
             file_data = codecs.open(source, 'r', 'utf-8')
             self.data = json.load(file_data)
             file_data.close()
+#            self.data = {k: v for k, v in self.all_data.items()
+#                         if k in data_keys_corp}
+#            self.data['nodes'] = self.all_data['nodes']
+#            self.data['edges'] = self.all_data['edges']
             self.data['file_name'] = source
+            if 'files' not in self.data:
+#                self.data['files'] = self.all_data['files']
+#            else:
+                self.data['files'] = [source]
+            if 'max_node_id' not in self.data:
+#                self.data['max_node_id'] = self.all_data['max_node_id']
+#            else:
+                self.data['max_node_id'] = self.max_node_id()
+            if 'max_edge_id' not in self.data:
+#                self.data['max_edge_id'] = self.all_data['max_edge_id']
+#            else:
+                self.data['max_edge_id'] = self.max_edge_id()
         if isinstance(source, Grno):
             self.data = {meta: source.meta[meta] for meta
-                         in meta_data_keys if meta in source.meta}
-            self.data.update({
-                'nodes': source.all_nodes(),
-                'edges': source.all_edges()})
-            for edge_type, map_type in map_type_map.items():
-                self.add_edges_from_dict(source.maps[map_type], edge_type)
+                         in data_keys_corp if meta in source.meta}
+            self.data['nodes'] = [node for node in source.nodes['speaker']]
+            self.data['nodes'].extend(source.nodes['indep'])
+            # master-file edges need to be implemented
+            self.data['edges'] = []
 
     def max_node_id(self):
         if self.data['nodes'] != []:
@@ -49,9 +64,11 @@ class GrnoJson:
 
     def add_edges_from_dict(self, data_dict, edge_type):
         new_edges = self.dict_to_edge_list(data_dict, edge_type)
-        self.data['edges'].extend(new_edges)
+        self.data['edges'] = self.data['edges'] + new_edges
 
     def write_to_file(self, file_name=''):
+        import json
+        import codecs
         if file_name == '':
             file_name = self.data['file_name']
         if 'master' not in self.data or self.data['master'] == '':
