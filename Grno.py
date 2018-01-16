@@ -1,22 +1,22 @@
-from data_maps import node_type_map_file
-from data_maps import data_keys_corp
-from functions import get_indep_nodes
+from GraphPynt.data_maps import node_type_map_file
+from GraphPynt.data_maps import data_keys_corp
+from GraphPynt.functions import get_indep_nodes
 # from functions import meta_data_keys
 
 
 class Grno:
     # Grno-objects are instantiated from pairs of
-    # GrnoJsonCorp and GrnoJsonFile-objects
+    # GrnoCorp and GrnoFile-objects
     def __init__(self, json_corp, json_file):
-        # get meta data from GrnoJsonCorp-object
+        # get meta data from GrnoCorp-object
         self.meta = {k: v for k, v in json_corp.data.items()
                      if k in data_keys_corp}
-        # get nodes from GrnoJsonFile-object
+        # get nodes from GrnoFile-object
         self.nodes = {node_type: [node for node
                                   in json_file.data['nodes']
                                   if node['type'] == abbr]
                       for abbr, node_type in node_type_map_file.items()}
-        # add speaker nodes from GrnoJsonCorp-object
+        # add speaker nodes from GrnoCorp-object
         file_speaker_node_ids = [node['id'] for node
                                  in self.nodes['speaker']]
         self.nodes['speaker'].extend(
@@ -36,23 +36,23 @@ class Grno:
                 self.edges['order'][node_type_map_file[node_type]].append(edge)
             if edge['type'] == 'a':
                 self.edges['anno'].append(edge)
-        # identify independent nodes in GrnoJsonFile-object
-        self.nodes['indep'] = get_indep_nodes(json_file.data['nodes'],
-                                              json_file.data['edges'])
-        # add independent nodes from GrnoJsonCorp-object
-        file_indep_node_ids = [node['id'] for node
-                               in self.nodes['indep']]
-        indep_nodes_corp = get_indep_nodes(json_corp.data['nodes'],
-                                           json_corp.data['edges'])
-        self.nodes['indep'].extend([node for node in indep_nodes_corp if
-                                    node['id'] not in file_indep_node_ids])
+        # identify independent nodes in GrnoFile-object
+        #self.nodes['indep'] = get_indep_nodes(json_file.data['nodes'],
+        #                                      json_file.data['edges'])
+        # add independent nodes from GrnoCorp-object
+        #file_indep_node_ids = [node['id'] for node
+        #                       in self.nodes['indep']]
+        #indep_nodes_corp = get_indep_nodes(json_corp.data['nodes'],
+        #                                   json_corp.data['edges'])
+        #self.nodes['indep'].extend([node for node in indep_nodes_corp if
+        #                            node['id'] not in file_indep_node_ids])
         # filter out independent nodes from other nodes
-        self.nodes['anno'] = [node for node in self.nodes['anno'] if
-                              node not in self.nodes['indep']]
+        #self.nodes['anno'] = [node for node in self.nodes['anno'] if
+        #                      node not in self.nodes['indep']]
         # maps from invisible nodes to visible nodes
-        self.maps = {'paragraph': self.edges_to_dict('p', self.all_edges()),
-                     'segment': self.edges_to_dict('s', self.all_edges()),
-                     'speaker': self.edges_to_dict('sp', self.all_edges())}
+        self.maps = {'paragraph': self.edges_to_dict('p', json_file.data['edges']),
+                     'segment': self.edges_to_dict('s', json_file.data['edges']),
+                     'speaker': self.edges_to_dict('sp', json_file.data['edges'])}
         self.files = json_corp.data['files']
         self.max_node_id = json_corp.data['max_node_id']
         self.max_edge_id = json_corp.data['max_edge_id']
@@ -109,12 +109,6 @@ class Grno:
         new_dict = {edge['end']: edge['start'] for edge
                     in edge_list if edge['type'] == edge_type}
         return new_dict
-
-    def get_master_data(self, file_name, master_file_name):
-        from GrnoJson import GrnoJson
-        file_path = '/'+'/'.join(file_name.split('/')[:-1])+'/'
-        master_file = file_path+master_file_name
-        return GrnoJson(master_file)
 
     # graph manipulation
     # create nodes

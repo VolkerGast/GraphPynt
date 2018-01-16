@@ -27,7 +27,7 @@ file = GrnoFile(data.json)
 
 grno = Grno(corp, file)
 
-When being saved, they will be split up into a corpus file, carrying a prefix 'c_', and a document file, carrying a prefix 'f_'.
+When being saved, the mono-document corpus file will be split up into a corpus file, carrying a prefix 'c_', and a document file, carrying a prefix 'f_'.
 
 # The Grno-class
 
@@ -42,13 +42,19 @@ g.nodes = {
  'token': []
  }
 
-g.edges = {
+g.edges = {{'anno': [],
+           'order':
+	     {'anno': [],
+             'segment': [],
+             'token': []}}
 
-{'anno': [],
+Moreover, Grno-objects contain a dictionary of mappings:
 
- 'order': {'anno': [],
-           'segment': [],
-           'token': []}}
+g.maps = {'paragraph': {},
+          'segment': {},
+          'speaker': {}}
+
+The paragraph-map contains mappings from paragraph-node ids to segment node ids, the segment-map contains mappings from segment node ids to annotation node and token ids. The speaker map contains mappings from token ids to speaker ids.
 
 # A typical workflow for graph manipulation:
 
